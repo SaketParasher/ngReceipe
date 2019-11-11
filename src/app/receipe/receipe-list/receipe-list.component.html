@@ -1,31 +1,18 @@
 <div class="row">
   <div class="col-xs-12">
-    <button class="btn btn-success">New Receipe</button>
+    <button class="btn btn-success" [routerLink]="['new']">
+      New Receipe
+    </button>
   </div>
 </div>
 <hr />
 <div class="row">
   <div class="col-xs-12">
-    <a
-      href="#"
-      class="list-group-item clearfix"
+    <app-receipe-item
       *ngFor="let receipe of receipes"
-    >
-      <div class="pull-left">
-        <h4 class="list-group-item-heading">
-          {{ receipe.name }}
-        </h4>
-        <p class="list-group-item-text">{{ receipe.description }}</p>
-      </div>
-      <span class="pull-right">
-        <img
-          [src]="receipe.imageURL"
-          alt=""
-          class="img-responsive"
-          style="height:80px"
-        />
-      </span>
-    </a>
-    <app-receipe-item></app-receipe-item>
+      [receipe]="receipe"
+      [index]="receipe.id"
+      (click)="onReceipeSelected(receipe)"
+    ></app-receipe-item>
   </div>
 </div>

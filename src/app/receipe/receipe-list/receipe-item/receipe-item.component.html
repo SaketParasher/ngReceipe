@@ -1,1 +1,21 @@
-<p>receipe-item works!</p>
+<a
+  style="cursor:pointer"
+  class="list-group-item clearfix"
+  [routerLink]="[index]"
+  routerLinkActive="active"
+>
+  <div class="pull-left" style="width:50%">
+    <h4 class="list-group-item-heading">
+      {{ receipe.name }}
+    </h4>
+    <p class="list-group-item-text">{{ receipe.description }}</p>
+  </div>
+  <span class="pull-right">
+    <img
+      [src]="receipe.imageURL"
+      alt=""
+      class="img-responsive"
+      style="height:80px"
+    />
+  </span>
+</a>

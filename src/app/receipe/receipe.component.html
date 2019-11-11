@@ -4,7 +4,10 @@
       <app-receipe-list></app-receipe-list>
     </div>
     <div class="col-md-7">
-      <app-receipe-detail></app-receipe-detail>
+      <router-outlet></router-outlet>
+      <!-- <app-receipe-detail
+        [selectedReceipe]="selectedReceipe"
+      ></app-receipe-detail> -->
     </div>
   </div>
 </div>
