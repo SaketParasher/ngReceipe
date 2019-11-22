@@ -15,11 +15,11 @@ export class ReceipeListComponent implements OnInit {
   // @Output()
   // receipeToEmit = new EventEmitter<Receipe>();
 
-  constructor(private receipeSVC: ReceipeService, private router: Router) {}
+  constructor(private receipeSVC: ReceipeService, private router: Router) { }
 
   ngOnInit() {
     this.receipes = this.receipeSVC.getReceipe();
-    this.receipeSVC.selectedReceipe.emit(this.receipes[0]);
+    //this.receipeSVC.selectedReceipe.emit(this.receipes[0]);
     //this.receipeToEmit.emit(this.receipes[0]);
   }
 

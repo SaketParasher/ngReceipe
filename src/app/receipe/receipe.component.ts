@@ -9,12 +9,12 @@ import { ReceipeService } from "./receipe.service";
 })
 export class ReceipeComponent implements OnInit {
   selectedReceipe: Receipe;
-  constructor(private receipeSVC: ReceipeService) {}
+  constructor(private receipeSVC: ReceipeService) { }
 
   ngOnInit() {
-    this.receipeSVC.selectedReceipe.subscribe((receipe: Receipe) => {
-      this.selectedReceipe = receipe;
-    });
+    // this.receipeSVC.selectedReceipe.subscribe((receipe: Receipe) => {
+    //   this.selectedReceipe = receipe;
+    // });
   }
 
   // receipeEmitted(receipe: Receipe) {

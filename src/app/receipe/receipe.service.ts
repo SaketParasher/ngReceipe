@@ -29,9 +29,9 @@ export class ReceipeService {
       ]
     )
   ];
-  constructor(private slSVC: ShoppingListService) {}
+  constructor(private slSVC: ShoppingListService) { }
 
-  public selectedReceipe = new EventEmitter<Receipe>();
+  //public selectedReceipe = new EventEmitter<Receipe>();
 
   getReceipe() {
     return this.receipe.slice();

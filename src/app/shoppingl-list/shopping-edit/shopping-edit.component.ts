@@ -1,12 +1,8 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  Output,
-  EventEmitter,
-  ElementRef
-} from "@angular/core";
+import { Subscription } from "rxjs";
+
+import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
 import { Ingrediant } from "../../shared/ingrediant.model";
+import { NgForm } from "@angular/forms";
 
 import { ShoppingListService } from "../shopping-list.service";
 @Component({
@@ -14,32 +10,62 @@ import { ShoppingListService } from "../shopping-list.service";
   templateUrl: "./shopping-edit.component.html",
   styleUrls: ["./shopping-edit.component.css"]
 })
-export class ShoppingEditComponent implements OnInit {
-  @ViewChild("nameInput", { static: false }) name: ElementRef;
-  @ViewChild("amountInput", { static: false }) amount: ElementRef;
+export class ShoppingEditComponent implements OnInit, OnDestroy {
+  // @ViewChild("nameInput", { static: false }) name: ElementRef;
+  // @ViewChild("amountInput", { static: false }) amount: ElementRef;
 
-  // @Output()
-  // emitIngrediant = new EventEmitter<Ingrediant>();
+  @ViewChild('ingrediantForm', { static: true })
+  ingForm: NgForm;
 
-  constructor(private shoppingSVC: ShoppingListService) {}
+  editModeSubscription: Subscription;
+  editMode = false;
+  editedIngrediantIndex: number;
+  editedIngrediant: Ingrediant;
 
-  ngOnInit() {}
+  constructor(private shoppingSVC: ShoppingListService) { }
 
-  addIngrediant(evt) {
-    evt.preventDefault();
-    console.log("On Add Ingrediant");
-    // this.emitIngrediant.emit(
-    //   new Ingrediant(
-    //     this.name.nativeElement.value,
-    //     this.amount.nativeElement.value
-    //   )
-    // );
+  ngOnInit() {
+    this.editModeSubscription = this.shoppingSVC.emitIngrediantIndexToEdit.subscribe((index) => {
+      this.editMode = true;
+      this.editedIngrediantIndex = index;
+      this.editedIngrediant = this.shoppingSVC.getIngrediantByIndex(index);
+      this.ingForm.setValue({
+        ingrediantName: this.editedIngrediant.name,
+        ingrediantAmount: this.editedIngrediant.amount
+      })
+    });
+  }
+
+  addIngrediant(ingrediantForm: NgForm) {
 
     this.shoppingSVC.addIngrediants(
       new Ingrediant(
-        this.name.nativeElement.value,
-        this.amount.nativeElement.value
+        ingrediantForm.value.ingrediantName,
+        ingrediantForm.value.ingrediantAmount
       )
     );
+    this.onClear();
+  }
+
+  updateIngrediant() {
+    let updatedIngrediant = new Ingrediant(this.ingForm.value.ingrediantName, this.ingForm.value.ingrediantAmount);
+    console.log(updatedIngrediant);
+    this.shoppingSVC.updateIngrediant(this.editedIngrediantIndex, updatedIngrediant);
+    this.onClear();
+  }
+
+  onClear() {
+    this.ingForm.reset();
+    this.editedIngrediant = null;
+    this.editMode = false;
+  }
+
+  deleteIngrediant() {
+    this.shoppingSVC.deleteIngrediant(this.editedIngrediantIndex);
+    this.onClear();
+  }
+
+  ngOnDestroy() {
+    this.editModeSubscription.unsubscribe();
   }
 }

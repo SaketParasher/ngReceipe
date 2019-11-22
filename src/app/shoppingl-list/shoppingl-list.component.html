@@ -3,20 +3,9 @@
     <app-shopping-edit></app-shopping-edit>
     <hr />
     <ul class="list-group">
-      <li
-        class="list-group-item"
-        style="cursor:pointer"
-        *ngFor="let ingrediant of ingrediants"
-      >
-        {{ ingrediant.name }} ({{ ingrediant.amount }})
+      <li class="list-group-item" style="cursor:pointer" *ngFor="let ingrediant of ingrediants; let i = index">
+        <a (click)="onEditIngrediant(i)"> {{ ingrediant.name }} ({{ ingrediant.amount }}) </a>
       </li>
     </ul>
   </div>
-</div>
-
-<div class="row">
-  <p app-highlight>This Content is highlighted.</p>
-  <p appBetteHighlight [highlightedColor]="'black'" [defaultColor]="'red'">
-    This is better Highlighted.
-  </p>
 </div>

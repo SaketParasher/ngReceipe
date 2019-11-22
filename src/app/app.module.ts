@@ -1,5 +1,6 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 
 import { AppComponent } from "./app.component";
 import { HeaderComponent } from "./header/header.component";
@@ -36,8 +37,8 @@ import { ReceipeEditComponent } from './receipe/receipe-edit/receipe-edit.compon
     NoreceipeComponent,
     ReceipeEditComponent
   ],
-  imports: [BrowserModule, AppRoutingModule],
+  imports: [BrowserModule, AppRoutingModule, FormsModule],
   providers: [ReceipeService, ShoppingListService],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }
