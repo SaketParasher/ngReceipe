@@ -2,6 +2,7 @@ import { Injectable, EventEmitter } from "@angular/core";
 import { Receipe } from "./receipe.model";
 import { Ingrediant } from "../shared/ingrediant.model";
 import { ShoppingListService } from "../shoppingl-list/shopping-list.service";
+import { Subject } from "rxjs";
 
 @Injectable()
 export class ReceipeService {
@@ -29,6 +30,10 @@ export class ReceipeService {
       ]
     )
   ];
+
+  // emit all receipes after adding or updating receipes array.
+  emitReceipes: Subject<Receipe[]> = new Subject<Receipe[]>();
+
   constructor(private slSVC: ShoppingListService) { }
 
   //public selectedReceipe = new EventEmitter<Receipe>();
@@ -43,4 +48,19 @@ export class ReceipeService {
   getReceipeById(id: number) {
     return this.receipe.find(receipe => receipe.id == id);
   }
+
+  // add a new receipe from edit receipe component
+  addNewReceipe(receipe: Receipe) {
+    receipe.id = this.receipe.length + 1;
+    this.receipe.push(receipe);
+    this.emitReceipes.next(this.receipe);
+  }
+
+  // update a receipe from edit receipe component
+  updateReceipe(id: number, updatedReceipe: Receipe) {
+    let indexToUpdate = this.receipe.indexOf(this.getReceipeById(id));
+    this.receipe[indexToUpdate] = updatedReceipe;
+    this.emitReceipes.next(this.receipe);
+  }
+
 }
