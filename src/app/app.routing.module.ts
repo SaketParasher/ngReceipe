@@ -6,10 +6,13 @@ import { ReceipeDetailComponent } from "./receipe/receipe-detail/receipe-detail.
 import { NoreceipeComponent } from "./receipe/receipe-detail/noreceipe/noreceipe.component";
 import { ReceipeEditComponent } from "./receipe/receipe-edit/receipe-edit.component";
 
+import { ReceipeDataResolver } from './receipe/receipe.resolver';
+
 const routes: Routes = [
   {
     path: "receipe",
     component: ReceipeComponent,
+    resolve: { allRecipes: ReceipeDataResolver },
     children: [
       { path: "", component: NoreceipeComponent },
       { path: "new", component: ReceipeEditComponent },
@@ -27,4 +30,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

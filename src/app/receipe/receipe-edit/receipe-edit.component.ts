@@ -29,6 +29,7 @@ export class ReceipeEditComponent implements OnInit {
     let receipeName = '';
     let receipeImagePath = '';
     let receipeDescription = '';
+    let rId = '';
     let receipeIngrediantsArray = new FormArray([]);
 
     if (this.editMode) {
@@ -36,6 +37,7 @@ export class ReceipeEditComponent implements OnInit {
       receipeName = receipe.name;
       receipeImagePath = receipe.imageURL;
       receipeDescription = receipe.description;
+      rId = receipe.restId;
       if (receipe['ingrediants']) {
         for (let ingrediant of receipe.ingrediants) {
           receipeIngrediantsArray.push(new FormGroup({
@@ -50,7 +52,8 @@ export class ReceipeEditComponent implements OnInit {
       'name': new FormControl(receipeName, Validators.required),
       'imagePath': new FormControl(receipeImagePath, Validators.required),
       'description': new FormControl(receipeDescription, Validators.required),
-      'ingrediants': receipeIngrediantsArray
+      'ingrediants': receipeIngrediantsArray,
+      'rid': new FormControl(rId)
     })
 
   }
@@ -70,7 +73,8 @@ export class ReceipeEditComponent implements OnInit {
     let imgURL = this.receipeForm.get("imagePath").value;
     let description = this.receipeForm.get("description").value;
     let ingrediants = this.receipeForm.get("ingrediants").value;
-    let receipeToSend = new Receipe(this.id, receipeName, description, imgURL, ingrediants);
+    let rid = this.receipeForm.get("rid").value;
+    let receipeToSend = new Receipe(this.id, receipeName, description, imgURL, ingrediants, rid);
     if (this.editMode) {
       this.receipeSVC.updateReceipe(this.id, receipeToSend);
       this.cancel();

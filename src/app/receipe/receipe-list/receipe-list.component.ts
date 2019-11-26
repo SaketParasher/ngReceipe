@@ -17,12 +17,16 @@ export class ReceipeListComponent implements OnInit, OnDestroy {
   // @Output()
   // receipeToEmit = new EventEmitter<Receipe>();
 
-  constructor(private receipeSVC: ReceipeService, private router: Router) { }
+  constructor(private receipeSVC: ReceipeService, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
 
     // getting all receipes on init of receipe list component
     this.receipes = this.receipeSVC.getReceipe();
+
+    // Now we are using RouteResolver to fetch all the receipes from database in OnInit
+    //this.route.data.subscribe((receipeData: { allRecipes: Receipe[] }) => { console.log(receipeData.allRecipes); this.receipes = receipeData.allRecipes })
+
     this.receipesSubscription = this.receipeSVC.emitReceipes.subscribe((receipes: Receipe[]) => {
       this.receipes = receipes;
     });
