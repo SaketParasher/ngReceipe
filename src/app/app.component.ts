@@ -1,15 +1,15 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
+import { AuthserviceService } from "./auth/auth/authservice.service";
 
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"]
 })
-export class AppComponent {
-  title = "ngRecipe";
-  sectionToShow: string = "receipe";
+export class AppComponent implements OnInit {
 
-  onSectionEmit(section) {
-    this.sectionToShow = section;
+  constructor(private authSVC: AuthserviceService) { }
+  ngOnInit() {
+    this.authSVC.autoLogin()
   }
 }

@@ -25,9 +25,12 @@
             ],
             "styles": [
               "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "./node_modules/toastmejs/dist/css/toastme.min.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/toastmejs/dist/js/toastme.min.js"
+            ]
           },
           "configurations": {
             "production": {

@@ -5,13 +5,15 @@ import { ShoppinglListComponent } from "./shoppingl-list/shoppingl-list.componen
 import { ReceipeDetailComponent } from "./receipe/receipe-detail/receipe-detail.component";
 import { NoreceipeComponent } from "./receipe/receipe-detail/noreceipe/noreceipe.component";
 import { ReceipeEditComponent } from "./receipe/receipe-edit/receipe-edit.component";
+import { AuthComponent } from "./auth/auth/auth.component";
 
 import { ReceipeDataResolver } from './receipe/receipe.resolver';
-
+import { AuthGuardService } from "./auth/auth/auth.guard";
 const routes: Routes = [
   {
     path: "receipe",
     component: ReceipeComponent,
+    canActivate: [AuthGuardService],
     resolve: { allRecipes: ReceipeDataResolver },
     children: [
       { path: "", component: NoreceipeComponent },
@@ -23,6 +25,7 @@ const routes: Routes = [
   },
 
   { path: "shopping-list", component: ShoppinglListComponent },
+  { path: 'auth', component: AuthComponent },
   { path: "", redirectTo: "receipe", pathMatch: "full" }
 ];
 
