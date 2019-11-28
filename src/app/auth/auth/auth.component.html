@@ -1,12 +1,16 @@
-<div class="container" *ngIf="errorMessage">
+<!-- <div class="container" *ngIf="errorMessage">
   <div class="row">
     <div class="col-sm-6">
-      <div class="alert alert-danger" role="alert">
+       <div class="alert alert-danger" role="alert">
         {{errorMessage}}
       </div>
     </div>
   </div>
-</div>
+</div> -->
+<!--
+<app-alert *ngIf="errorMessage" [message]="errorMessage" (emitClose)="onHandleError()"></app-alert> -->
+
+<ng-template appPlaceholder></ng-template>
 
 <div class="container" *ngIf="!isLoading">
   <div class="row">

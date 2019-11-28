@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 
 
 import { AuthserviceService, AuthResponseData } from "./authservice.service";
-
+import { AlertComponent } from 'src/app/shared/alert/alert.component';
+import { PlaceholderDirective } from "../../shared/placeholder/placeholder.directive";
 
 
 @Component({
@@ -15,12 +16,18 @@ import { AuthserviceService, AuthResponseData } from "./authservice.service";
 })
 export class AuthComponent implements OnInit {
 
+  // getting the reference of first Placeholder directive used in the dom using view child
+  @ViewChild(PlaceholderDirective, { static: false })
+  alertHost: PlaceholderDirective;
+
+  closeSubscription: Subscription;
+
   isLoginMode = true;
   isLoading = false;
   errorMessage: string = null;
   responseObservable: Observable<AuthResponseData>;
 
-  constructor(private authSVC: AuthserviceService, private router: Router) { }
+  constructor(private authSVC: AuthserviceService, private router: Router, private componentFactoryresolver: ComponentFactoryResolver) { }
 
   ngOnInit() {
   }
@@ -50,11 +57,31 @@ export class AuthComponent implements OnInit {
     },
       (errorMessage) => {
         this.errorMessage = errorMessage;
-        setTimeout(() => { this.errorMessage = null }, 3500);
+        this.showErrorAlert(errorMessage);
+        //setTimeout(() => { this.errorMessage = null }, 5500);
         this.isLoading = false;
         console.log(errorMessage);
       })
     authForm.reset();
+  }
+
+  //close the modal on output Emission
+  onHandleError() {
+    this.errorMessage = null;
+  }
+
+  // Dynamic Component Programatically
+  private showErrorAlert(error: string) {
+    const alertComponentFactory = this.componentFactoryresolver.resolveComponentFactory(AlertComponent);
+    const hostViewContainerRef = this.alertHost.viewContainerRef;
+    hostViewContainerRef.clear();
+    const componentRef = hostViewContainerRef.createComponent(alertComponentFactory);
+    componentRef.instance.message = error;
+    this.closeSubscription = componentRef.instance.emitClose.subscribe(() => {
+      this.closeSubscription.unsubscribe();
+      hostViewContainerRef.clear();
+    })
+
   }
 
 }
