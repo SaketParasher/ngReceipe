@@ -58,6 +58,9 @@ export class ReceipeEditComponent implements OnInit {
 
   }
 
+  get ingrediantsControl() {
+    return (this.receipeForm.get('ingrediants') as FormArray).controls
+  }
   addIngrediant() {
     (<FormArray>this.receipeForm.get('ingrediants')).push(new FormGroup({
       'name': new FormControl(),
@@ -84,7 +87,7 @@ export class ReceipeEditComponent implements OnInit {
     }
   }
 
-  private cancel() {
+  cancel() {
     this.router.navigate(['../'], { relativeTo: this.route });
   }
 

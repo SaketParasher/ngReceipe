@@ -6,7 +6,7 @@ import { Directive, HostListener, ElementRef, Renderer2 } from "@angular/core";
 export class ToggleDropdownDirective {
   constructor(private elRef: ElementRef, private renderer: Renderer2) { }
 
-  @HostListener("click") onclick(event: Event) {
+  @HostListener("click") onclick() {
     console.log("Inside Directivee");
     if (this.elRef.nativeElement.className.indexOf("open") == -1) {
       this.renderer.addClass(this.elRef.nativeElement, "open");

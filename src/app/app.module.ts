@@ -17,9 +17,9 @@ import { AuthGuardService } from './auth/auth/auth.guard';
 
 import { ReceipeModule } from './receipe.module';
 import { ReceipeRoutingModule } from './receipe.routing.module';
-import { ShoppingListModule } from './shopping-list.module';
+//import { ShoppingListModule } from './shopping-list.module';
 import { SharedModule } from './shared.module';
-import { AuthModule } from './auth.module';
+//import { AuthModule } from './auth.module';
 
 @NgModule({
   declarations: [
@@ -31,8 +31,8 @@ import { AuthModule } from './auth.module';
   imports: [
     BrowserModule, AppRoutingModule,
     HttpClientModule, ReceipeModule,
-    ReceipeRoutingModule, ShoppingListModule,
-    SharedModule, AuthModule
+    ReceipeRoutingModule,
+    SharedModule
   ],
 
   providers: [
