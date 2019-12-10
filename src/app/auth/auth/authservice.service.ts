@@ -7,6 +7,10 @@ import { Router } from "@angular/router";
 
 import { User } from "./user.model";
 
+import * as fromApp from '../../store/app.reducer';
+import * as AuthActions from '../../store/actions/auth.action';
+import { Store } from '@ngrx/store';
+
 export interface AuthResponseData {
   idToken: string;
   email: string;
@@ -23,8 +27,8 @@ const API_KEY = "AIzaSyC3Qa9V7VQiJ0T_Bd3IEJ8IN99V4n0-CM4"
 })
 export class AuthserviceService {
 
-  emitUser = new BehaviorSubject<User>(null);
-  constructor(private http: HttpClient, private router: Router) { }
+  //emitUser = new BehaviorSubject<User>(null);
+  constructor(private http: HttpClient, private router: Router, private store: Store<fromApp.AppState>) { }
 
   signUp(email: string, password: string) {
     return this.http.post<AuthResponseData>("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + API_KEY,
@@ -71,12 +75,20 @@ export class AuthserviceService {
 
     const loadedUser = new User(userData.email, userData.id, userData._token, new Date(userData._tokenExpirationDate))
     if (loadedUser.token) {
-      this.emitUser.next(loadedUser);
+      //this.emitUser.next(loadedUser);
+      this.store.dispatch(new AuthActions.Login(
+        {
+          email: loadedUser.email,
+          userId: loadedUser.id,
+          token: loadedUser.token,
+          expirationDate: new Date(userData._tokenExpirationDate)
+        }))
     }
   }
 
   Logout() {
-    this.emitUser.next(null);
+    //this.emitUser.next(null);
+    this.store.dispatch(new AuthActions.Logout())
     localStorage.removeItem('userData');
     this.router.navigate(['/auth']);
   }
@@ -103,7 +115,13 @@ export class AuthserviceService {
     console.log('Date After Which Token Expires');
     console.log(expirationDate);
     let userToEmit = new User(email, userId, userToken, expirationDate);
-    this.emitUser.next(userToEmit);
+    //this.emitUser.next(userToEmit);
+    this.store.dispatch(new AuthActions.Login({
+      email: email,
+      userId: userId,
+      token: userToken,
+      expirationDate: expirationDate
+    }))
     localStorage.setItem('userData', JSON.stringify(userToEmit));
   }
 

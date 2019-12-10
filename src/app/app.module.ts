@@ -21,6 +21,15 @@ import { ReceipeRoutingModule } from './receipe.routing.module';
 import { SharedModule } from './shared.module';
 //import { AuthModule } from './auth.module';
 
+
+// STORE MODULES AND REDUCERS
+import { StoreModule } from "@ngrx/store";
+import * as fromApp from './store/app.reducer';
+//import { ShoppingListReducer } from './store/reducers/shopping-list.reducers';
+//import { AuthReducer } from './store/reducers/auth.reducer';
+import { EffectsModule } from "@ngrx/effects";
+import { AuthEffects } from './store/effects/auth.effects';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -32,7 +41,9 @@ import { SharedModule } from './shared.module';
     BrowserModule, AppRoutingModule,
     HttpClientModule, ReceipeModule,
     ReceipeRoutingModule,
-    SharedModule
+    SharedModule,
+    StoreModule.forRoot(fromApp.AppReducer),
+    EffectsModule.forRoot([AuthEffects])
   ],
 
   providers: [

@@ -6,6 +6,11 @@ import { Ingrediant } from "../shared/ingrediant.model";
 import { ShoppingListService } from "../shoppingl-list/shopping-list.service";
 import { ReceipeDataService } from "../shared/receipe-data.service";
 
+// NGRX IMPORTS
+import { Store } from "@ngrx/store";
+import { AddIngrediants } from "../store/actions/shopping-list.actions";
+import * as fromApp from '../store/app.reducer';
+
 @Injectable()
 export class ReceipeService {
   private receipe: Receipe[]
@@ -37,7 +42,9 @@ export class ReceipeService {
   // emit all receipes after adding or updating receipes array.
   emitReceipes: Subject<Receipe[]> = new Subject<Receipe[]>();
 
-  constructor(private slSVC: ShoppingListService, private receipeSVC: ReceipeDataService) { }
+  constructor(private slSVC: ShoppingListService, private receipeSVC: ReceipeDataService,
+    private store: Store<fromApp.AppState>
+  ) { }
 
   //public selectedReceipe = new EventEmitter<Receipe>();
 
@@ -50,7 +57,8 @@ export class ReceipeService {
   }
 
   addIngrediantsToShopping(ingrediant: Ingrediant[]) {
-    this.slSVC.addIngrediantsToShoppingList(ingrediant);
+    //this.slSVC.addIngrediantsToShoppingList(ingrediant);
+    this.store.dispatch(new AddIngrediants(ingrediant));
   }
   getReceipeById(id: number) {
     return this.receipe.find(receipe => receipe.id == id);

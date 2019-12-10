@@ -8,6 +8,11 @@ import { AuthserviceService, AuthResponseData } from "./authservice.service";
 import { AlertComponent } from 'src/app/shared/alert/alert.component';
 import { PlaceholderDirective } from "../../shared/placeholder/placeholder.directive";
 
+// NGRX STORE AND EFFECTS IMPORTS
+import { Store } from '@ngrx/store';
+import * as fromApp from '../../store/app.reducer';
+import * as AuthActions from '../../store/actions/auth.action';
+
 
 @Component({
   selector: 'app-auth',
@@ -27,9 +32,22 @@ export class AuthComponent implements OnInit {
   errorMessage: string = null;
   responseObservable: Observable<AuthResponseData>;
 
-  constructor(private authSVC: AuthserviceService, private router: Router, private componentFactoryresolver: ComponentFactoryResolver) { }
+  constructor(
+    private authSVC: AuthserviceService,
+    private router: Router,
+    private componentFactoryresolver: ComponentFactoryResolver,
+    private store: Store<fromApp.AppState>
+  ) { }
 
   ngOnInit() {
+
+    this.store.select('auth').subscribe((authData) => {
+      this.isLoading = authData.loading;
+      this.errorMessage = authData.authError;
+      if (this.errorMessage) {
+        this.showErrorAlert(this.errorMessage);
+      }
+    })
   }
 
   switchModes() {
@@ -42,7 +60,10 @@ export class AuthComponent implements OnInit {
     let password = authForm.value.password;
 
     if (this.isLoginMode) {
-      this.responseObservable = this.authSVC.Login(email, password);
+      //this.responseObservable = this.authSVC.Login(email, password);
+      // now we won't logi using service now we will login using AuthEffect for which we need to dispatch
+      // LoginStart Action and then effect will dispatch login action for setting the user
+      this.store.dispatch(new AuthActions.LoginStarts({ email: email, password: password }))
     } else {
       if (authForm.valid) {
         this.responseObservable = this.authSVC.signUp(email, password)
@@ -50,18 +71,18 @@ export class AuthComponent implements OnInit {
     }
 
     // Storing both login and signup in same observable and then subscribing at one place
-    this.responseObservable.subscribe((authData) => {
-      this.isLoading = false;
-      this.router.navigate(['/receipe']);
-      console.log(authData)
-    },
-      (errorMessage) => {
-        this.errorMessage = errorMessage;
-        this.showErrorAlert(errorMessage);
-        //setTimeout(() => { this.errorMessage = null }, 5500);
-        this.isLoading = false;
-        console.log(errorMessage);
-      })
+    // this.responseObservable.subscribe((authData) => {
+    //   this.isLoading = false;
+    //   this.router.navigate(['/receipe']);
+    //   console.log(authData)
+    // },
+    //   (errorMessage) => {
+    //     this.errorMessage = errorMessage;
+    //     this.showErrorAlert(errorMessage);
+    //     //setTimeout(() => { this.errorMessage = null }, 5500);
+    //     this.isLoading = false;
+    //     console.log(errorMessage);
+    //   })
     authForm.reset();
   }
 

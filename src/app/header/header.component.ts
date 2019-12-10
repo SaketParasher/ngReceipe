@@ -2,6 +2,10 @@ import { Component, OnInit, Output, EventEmitter, OnDestroy } from "@angular/cor
 import { AuthserviceService } from "../auth/auth/authservice.service";
 import { Subscription } from 'rxjs';
 
+import * as fromApp from '../store/app.reducer';
+import { Store } from '@ngrx/store';
+
+
 @Component({
   selector: "app-header",
   templateUrl: "./header.component.html",
@@ -13,11 +17,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   authenticationSubscription: Subscription;
   isAuthenticated = false;
 
-  constructor(private authSVC: AuthserviceService) { }
+  constructor(private authSVC: AuthserviceService, private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
-    this.authenticationSubscription = this.authSVC.emitUser.subscribe((user) => {
-      this.isAuthenticated = !!user;
+    this.authenticationSubscription = this.store.select('auth').subscribe((user) => {
+      this.isAuthenticated = !!user.user;
     })
   }
 

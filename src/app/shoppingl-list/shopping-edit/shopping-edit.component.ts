@@ -1,10 +1,15 @@
 import { Subscription } from "rxjs";
-
 import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
 import { Ingrediant } from "../../shared/ingrediant.model";
 import { NgForm } from "@angular/forms";
 
 import { ShoppingListService } from "../shopping-list.service";
+
+// NGRX IMPORTS
+import { Store } from "@ngrx/store";
+import * as ShoppingListActions from "../../store/actions/shopping-list.actions";
+import * as fromApp from '../../store/app.reducer';
+
 @Component({
   selector: "app-shopping-edit",
   templateUrl: "./shopping-edit.component.html",
@@ -22,13 +27,24 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   editedIngrediantIndex: number;
   editedIngrediant: Ingrediant;
 
-  constructor(private shoppingSVC: ShoppingListService) { }
+  constructor(private shoppingSVC: ShoppingListService,
+    private store: Store<fromApp.AppState>
+  ) { }
 
   ngOnInit() {
-    this.editModeSubscription = this.shoppingSVC.emitIngrediantIndexToEdit.subscribe((index) => {
+    // this.editModeSubscription = this.shoppingSVC.emitIngrediantIndexToEdit.subscribe((index) => {
+    //   this.editMode = true;
+    //   this.editedIngrediantIndex = index;
+    //   this.editedIngrediant = this.shoppingSVC.getIngrediantByIndex(index);
+    //   this.ingForm.setValue({
+    //     ingrediantName: this.editedIngrediant.name,
+    //     ingrediantAmount: this.editedIngrediant.amount
+    //   })
+    // });
+    this.editModeSubscription = this.shoppingSVC.emitIngrediantToEdit.subscribe((editedIngrediant) => {
       this.editMode = true;
-      this.editedIngrediantIndex = index;
-      this.editedIngrediant = this.shoppingSVC.getIngrediantByIndex(index);
+      this.editedIngrediantIndex = editedIngrediant.index;
+      this.editedIngrediant = editedIngrediant.ingrediant;
       this.ingForm.setValue({
         ingrediantName: this.editedIngrediant.name,
         ingrediantAmount: this.editedIngrediant.amount
@@ -38,12 +54,16 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
 
   addIngrediant(ingrediantForm: NgForm) {
 
-    this.shoppingSVC.addIngrediants(
-      new Ingrediant(
-        ingrediantForm.value.ingrediantName,
-        ingrediantForm.value.ingrediantAmount
-      )
-    );
+    // this.shoppingSVC.addIngrediants(
+    //   new Ingrediant(
+    //     ingrediantForm.value.ingrediantName,
+    //     ingrediantForm.value.ingrediantAmount
+    //   )
+    // );
+
+    // Now we will stote the ingrediant into our store
+    let newIngrediant = new Ingrediant(ingrediantForm.value.ingrediantName, ingrediantForm.value.ingrediantAmount)
+    this.store.dispatch(new ShoppingListActions.AddIngrediant(newIngrediant))
     this.onClear();
   }
 
@@ -61,7 +81,8 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
   }
 
   deleteIngrediant() {
-    this.shoppingSVC.deleteIngrediant(this.editedIngrediantIndex);
+    //this.shoppingSVC.deleteIngrediant(this.editedIngrediantIndex);
+    this.store.dispatch(new ShoppingListActions.DeleteIngrediants(this.editedIngrediantIndex));
     this.onClear();
   }
 
