@@ -30,6 +30,9 @@ import * as fromApp from './store/app.reducer';
 import { EffectsModule } from "@ngrx/effects";
 import { AuthEffects } from './store/effects/auth.effects';
 
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from 'src/environments/environment';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -43,7 +46,8 @@ import { AuthEffects } from './store/effects/auth.effects';
     ReceipeRoutingModule,
     SharedModule,
     StoreModule.forRoot(fromApp.AppReducer),
-    EffectsModule.forRoot([AuthEffects])
+    EffectsModule.forRoot([AuthEffects]),
+    StoreDevtoolsModule.instrument({ logOnly: environment.production })
   ],
 
   providers: [

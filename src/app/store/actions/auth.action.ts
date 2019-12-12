@@ -4,7 +4,10 @@ export enum AuthActionTypesEnum {
   LOGIN = 'LOGIN',
   LOGOUT = 'LOGOUT',
   LOGIN_STARTS = 'LOGIN_STARTS',
-  LOGIN_FAILS = 'LOGIN_FAILS'
+  LOGIN_FAILS = 'LOGIN_FAILS',
+  SIGNUP_STARTS = 'SIGNUP_STARTS',
+  CLEAR_ERRORS = 'CLEAR_ERRORS',
+  AUTO_LOGIN = 'AUTO_LOGIN'
 
 }
 
@@ -33,4 +36,17 @@ export class LoginFails implements Action {
   constructor(public payload: string) { }
 }
 
-export type AuthActionTypes = Login | Logout | LoginStarts | LoginFails;
+export class SignupStarts implements Action {
+  readonly type = AuthActionTypesEnum.SIGNUP_STARTS;
+  constructor(public payload: { email: string, password: string }) { }
+}
+
+export class ClearErrors implements Action {
+  readonly type = AuthActionTypesEnum.CLEAR_ERRORS;
+}
+
+export class AutoLogin implements Action {
+  readonly type = AuthActionTypesEnum.AUTO_LOGIN;
+}
+
+export type AuthActionTypes = Login | Logout | LoginStarts | LoginFails | SignupStarts | ClearErrors | AutoLogin;

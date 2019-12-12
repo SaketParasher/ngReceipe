@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactoryResolver, ViewChild } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subscription } from "rxjs";
@@ -19,13 +19,14 @@ import * as AuthActions from '../../store/actions/auth.action';
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css']
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent implements OnInit, OnDestroy {
 
   // getting the reference of first Placeholder directive used in the dom using view child
   @ViewChild(PlaceholderDirective, { static: false })
   alertHost: PlaceholderDirective;
 
   closeSubscription: Subscription;
+  authSubsciption: Subscription;
 
   isLoginMode = true;
   isLoading = false;
@@ -41,7 +42,7 @@ export class AuthComponent implements OnInit {
 
   ngOnInit() {
 
-    this.store.select('auth').subscribe((authData) => {
+    this.authSubsciption = this.store.select('auth').subscribe((authData) => {
       this.isLoading = authData.loading;
       this.errorMessage = authData.authError;
       if (this.errorMessage) {
@@ -55,7 +56,7 @@ export class AuthComponent implements OnInit {
   }
 
   onAuthSubmit(authForm: NgForm) {
-    this.isLoading = true;
+    //this.isLoading = true;
     let email = authForm.value.email;
     let password = authForm.value.password;
 
@@ -66,7 +67,8 @@ export class AuthComponent implements OnInit {
       this.store.dispatch(new AuthActions.LoginStarts({ email: email, password: password }))
     } else {
       if (authForm.valid) {
-        this.responseObservable = this.authSVC.signUp(email, password)
+        //this.responseObservable = this.authSVC.signUp(email, password)
+        this.store.dispatch(new AuthActions.SignupStarts({ email: email, password: password }))
       }
     }
 
@@ -88,7 +90,8 @@ export class AuthComponent implements OnInit {
 
   //close the modal on output Emission
   onHandleError() {
-    this.errorMessage = null;
+    //this.errorMessage = null;
+    this.store.dispatch(new AuthActions.ClearErrors())
   }
 
   // Dynamic Component Programatically
@@ -103,6 +106,9 @@ export class AuthComponent implements OnInit {
       hostViewContainerRef.clear();
     })
 
+  }
+  ngOnDestroy() {
+    this.authSubsciption.unsubscribe();
   }
 
 }

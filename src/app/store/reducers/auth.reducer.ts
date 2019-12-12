@@ -43,6 +43,19 @@ export function AuthReducer(state = initialState, action: AuthActions.AuthAction
         loading: false
       }
 
+    case AuthActions.AuthActionTypesEnum.SIGNUP_STARTS:
+      return {
+        ...state,
+        authError: null,
+        loading: true
+      }
+
+    case AuthActions.AuthActionTypesEnum.CLEAR_ERRORS:
+      return {
+        ...state,
+        authError: null
+      }
+
     default:
       return {
         ...state

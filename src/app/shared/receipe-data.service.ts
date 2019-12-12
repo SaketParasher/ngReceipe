@@ -5,12 +5,16 @@ import { map, tap, take, exhaustMap } from 'rxjs/operators';
 
 import { AuthserviceService } from '../auth/auth/authservice.service';
 
+import { Store } from '@ngrx/store';
+import * as fromApp from '../store/app.reducer';
+import * as ReceipeActions from '../store/actions/receipe.action';
+
 const Receipe_URL = "https://ng-receipe-87d8a.firebaseio.com/receipes.json";
 
 @Injectable({ providedIn: 'root' })
 export class ReceipeDataService {
 
-  constructor(private http: HttpClient, private authSVC: AuthserviceService) { }
+  constructor(private http: HttpClient, private authSVC: AuthserviceService, private store: Store<fromApp.AppState>) { }
 
   getReceipes() {
 
@@ -40,7 +44,10 @@ export class ReceipeDataService {
             };
             return rArr
           }),
-        tap(receipes => console.log(receipes))
+        tap(receipes => {
+          console.log(receipes);
+          this.store.dispatch(new ReceipeActions.AddReceipes(receipes))
+        })
       )
   }
 

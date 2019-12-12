@@ -4,6 +4,10 @@ import { NgForm, FormGroup, FormControl, FormArray, Validators } from '@angular/
 import { ReceipeService } from "../receipe.service";
 import { Receipe } from '../receipe.model';
 
+import * as fromApp from '../../store/app.reducer';
+import { Store } from '@ngrx/store';
+import { map } from 'rxjs/operators';
+
 @Component({
   selector: "app-receipe-edit",
   templateUrl: "./receipe-edit.component.html",
@@ -14,7 +18,12 @@ export class ReceipeEditComponent implements OnInit {
   editMode: boolean = false;
   receipeForm: FormGroup;
 
-  constructor(private route: ActivatedRoute, private receipeSVC: ReceipeService, private router: Router) { }
+  constructor(
+    private route: ActivatedRoute,
+    private receipeSVC: ReceipeService,
+    private router: Router,
+    private store: Store<fromApp.AppState>
+  ) { }
 
   ngOnInit() {
     this.route.params.subscribe((params: Params) => {
@@ -33,13 +42,25 @@ export class ReceipeEditComponent implements OnInit {
     let receipeIngrediantsArray = new FormArray([]);
 
     if (this.editMode) {
-      const receipe = this.receipeSVC.getReceipeById(this.id);
-      receipeName = receipe.name;
-      receipeImagePath = receipe.imageURL;
-      receipeDescription = receipe.description;
-      rId = receipe.restId;
-      if (receipe['ingrediants']) {
-        for (let ingrediant of receipe.ingrediants) {
+      // let receipe = this.receipeSVC.getReceipeById(this.id);
+      let receipeToSet;
+      this.store.select('receipe').pipe(
+        map(receipes => {
+          return receipes.receipes.find((receipe, ind) => {
+            return ind == this.id - 1;
+          })
+        })
+      ).subscribe((recipe) => {
+        receipeToSet = recipe;
+      });
+      console.log('ReceipeToSet');
+      console.log(receipeToSet);
+      receipeName = receipeToSet.name;
+      receipeImagePath = receipeToSet.imageURL;
+      receipeDescription = receipeToSet.description;
+      rId = receipeToSet.restId;
+      if (receipeToSet['ingrediants']) {
+        for (let ingrediant of receipeToSet.ingrediants) {
           receipeIngrediantsArray.push(new FormGroup({
             'name': new FormControl(ingrediant.name, Validators.required),
             'amount': new FormControl(ingrediant.amount, Validators.required)

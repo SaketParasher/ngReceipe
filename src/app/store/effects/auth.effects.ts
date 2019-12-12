@@ -6,6 +6,7 @@ import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 
 import * as AuthActions from '../actions/auth.action';
+import { User } from 'src/app/auth/auth/user.model';
 
 
 export interface AuthResponseData {
@@ -16,7 +17,45 @@ export interface AuthResponseData {
   localId: string;
   registered?: boolean;
 }
-const API_KEY = "AIzaSyC3Qa9V7VQiJ0T_Bd3IEJ8IN99V4n0-CM4"
+const API_KEY = "AIzaSyC3Qa9V7VQiJ0T_Bd3IEJ8IN99V4n0-CM4";
+
+const handleSuccess = (responseData) => {
+  // once login is success then we will dispatch Login action from inside not outside because outside
+  // observable chain must not die. This action will automatically gets dispatched by ngRx effects
+  const expirationDate = new Date(new Date().getTime() + +responseData.expiresIn * 1000);
+  const user = new User(responseData.email, responseData.localId, responseData.idToken, expirationDate)
+  localStorage.setItem('userData', JSON.stringify(user));
+  return new AuthActions.Login({
+    email: responseData.email,
+    userId: responseData.localId,
+    token: responseData.idToken,
+    expirationDate: expirationDate
+  })
+};
+
+const handleError = (errorResponse: any) => {
+  let errorMessage = "An Unknown Error Occured!!!!";
+
+  if (errorResponse.error && errorResponse.error.error) {
+    switch (errorResponse.error.error.message) {
+      case 'EMAIL_EXISTS':
+        errorMessage = "This Email Already Exists!!!!";
+      case 'EMAIL_NOT_FOUND':
+        errorMessage = "Email Entered is not a valid Email!!!!";
+      case 'INVALID_PASSWORD':
+        errorMessage = "Password is not Valid for Given Email!!!!";
+      case 'EMAIL_EXISTS':
+        errorMessage = "Email Alredy Exists!!!!";
+
+      default:
+        break;
+    }
+    return of(new AuthActions.LoginFails(errorMessage))
+  } else {
+    return of(new AuthActions.LoginFails(errorMessage))
+  }
+
+}
 
 // In effects we will react to all the dispatched actions and the actions will be filtered by ofType
 // An Effect in the end should dispatch an Action when its done because this effect doesn't change the state itself
@@ -26,6 +65,27 @@ const API_KEY = "AIzaSyC3Qa9V7VQiJ0T_Bd3IEJ8IN99V4n0-CM4"
 export class AuthEffects {
 
   constructor(private actions$: Actions, private http: HttpClient, private router: Router) { }
+
+  @Effect()
+  authSignup = this.actions$.pipe(
+    ofType(AuthActions.AuthActionTypesEnum.SIGNUP_STARTS),
+    switchMap((signupData: AuthActions.SignupStarts) => {
+      return this.http.post<AuthResponseData>("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + API_KEY,
+        {
+          email: signupData.payload.email,
+          password: signupData.payload.password,
+          returnSecureToken: true
+        }
+      ).pipe(
+        map((responseData) => {
+          return handleSuccess(responseData);
+        }),
+        catchError(errorResponse => {
+          return handleError(errorResponse);
+        })
+      )
+    })
+  )
 
   @Effect()
   authLogin = this.actions$.pipe(
@@ -41,35 +101,10 @@ export class AuthEffects {
         }
       ).pipe(
         map((responseData) => {
-          // once login is success then we will dispatch Login action from inside not outside because outside
-          // observable chain must not die. This action will automatically gets dispatched by ngRx effects
-          const expirationDate = new Date(new Date().getTime() + +responseData.expiresIn * 1000)
-          return new AuthActions.Login({
-            email: responseData.email,
-            userId: responseData.localId,
-            token: responseData.idToken,
-            expirationDate: expirationDate
-          })
+          return handleSuccess(responseData);
         }),
         catchError(errorResponse => {
-          let errorMessage = "An Unknown Error Occured!!!!";
-
-          if (errorResponse.error && errorResponse.error.error) {
-            switch (errorResponse.error.error.message) {
-              case 'EMAIL_EXISTS':
-                errorMessage = "This Email Already Exists!!!!";
-              case 'EMAIL_NOT_FOUND':
-                errorMessage = "Email Entered is not a valid Email!!!!";
-              case 'INVALID_PASSWORD':
-                errorMessage = "Password is not Valid for Given Email!!!!";
-              default:
-                break;
-            }
-            return of(new AuthActions.LoginFails(errorMessage))
-          } else {
-            return of(new AuthActions.LoginFails(errorMessage))
-          }
-
+          return handleError(errorResponse);
         })
       )
     })
@@ -80,5 +115,41 @@ export class AuthEffects {
     ofType(AuthActions.AuthActionTypesEnum.LOGIN),
     tap(() => this.router.navigate(['/receipe']))
   )
+
+  @Effect()
+  autoLogin = this.actions$.pipe(
+    ofType(AuthActions.AuthActionTypesEnum.AUTO_LOGIN),
+    map(() => {
+      let userData = JSON.parse(localStorage.getItem('userData'));
+      if (!userData) {
+        return { type: 'DUMMY' };
+      }
+
+      const loadedUser = new User(userData.email, userData.id, userData._token, new Date(userData._tokenExpirationDate))
+      if (loadedUser.token) {
+        //this.emitUser.next(loadedUser);
+        return new AuthActions.Login(
+          {
+            email: loadedUser.email,
+            userId: loadedUser.id,
+            token: loadedUser.token,
+            expirationDate: new Date(userData._tokenExpirationDate)
+          })
+      }
+      return { type: 'DUMMY' }
+
+    })
+  )
+
+  @Effect({ dispatch: false })
+  logout = this.actions$.pipe(
+    ofType(AuthActions.AuthActionTypesEnum.LOGOUT),
+    tap(() => {
+      localStorage.removeItem('userData');
+      this.router.navigate(['/auth'])
+    })
+  )
+
+
 
 }

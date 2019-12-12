@@ -89,8 +89,8 @@ export class AuthserviceService {
   Logout() {
     //this.emitUser.next(null);
     this.store.dispatch(new AuthActions.Logout())
-    localStorage.removeItem('userData');
-    this.router.navigate(['/auth']);
+    // localStorage.removeItem('userData');
+    // this.router.navigate(['/auth']);
   }
 
   private handleError(errorResponse: HttpErrorResponse) {

@@ -4,6 +4,10 @@ import { Component, OnInit, Output, EventEmitter, OnDestroy } from "@angular/cor
 import { Receipe } from "../receipe.model";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subscription } from "rxjs";
+import { map } from 'rxjs/operators';
+
+import { Store } from '@ngrx/store';
+import * as fromApp from '../../store/app.reducer';
 
 @Component({
   selector: "app-receipe-list",
@@ -17,12 +21,23 @@ export class ReceipeListComponent implements OnInit, OnDestroy {
   // @Output()
   // receipeToEmit = new EventEmitter<Receipe>();
 
-  constructor(private receipeSVC: ReceipeService, private router: Router, private route: ActivatedRoute) { }
+  constructor(
+    private receipeSVC: ReceipeService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private store: Store<fromApp.AppState>
+  ) { }
 
   ngOnInit() {
 
     // getting all receipes on init of receipe list component
-    this.receipes = this.receipeSVC.getReceipe();
+    //this.receipes = this.receipeSVC.getReceipe();
+
+    this.store.select('receipe').pipe(
+      map((receipes) => receipes.receipes)
+    ).subscribe((allReceipes) => {
+      this.receipes = allReceipes;
+    })
 
     // Now we are using RouteResolver to fetch all the receipes from database in OnInit
     //this.route.data.subscribe((receipeData: { allRecipes: Receipe[] }) => { console.log(receipeData.allRecipes); this.receipes = receipeData.allRecipes })
